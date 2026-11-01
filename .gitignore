@@ -1,0 +1,19 @@
+# Build output and caches
+.gradle/
+.kotlin/
+build/
+**/build/
+captures/
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+
+# Machine-specific
+local.properties
+
+# Release signing — NEVER commit (see RELEASING.md)
+keystore.properties
+*.jks
+*.keystore

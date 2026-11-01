@@ -1,0 +1,54 @@
+CREATE TABLE DiaryEntry (
+    id TEXT NOT NULL PRIMARY KEY,
+    productId TEXT NOT NULL,
+    entryDate TEXT NOT NULL,       -- 'YYYY-MM-DD'
+    amountGrams REAL NOT NULL,
+    unitUsedId TEXT,                -- FK -> ProductUnit.id, nullable
+    kcal REAL NOT NULL,             -- snapshot, scaled by amountGrams
+    protein REAL NOT NULL,
+    fat REAL NOT NULL,
+    carb REAL NOT NULL,
+    createdAt INTEGER NOT NULL,
+    FOREIGN KEY (productId) REFERENCES Product(id) ON DELETE RESTRICT,
+    FOREIGN KEY (unitUsedId) REFERENCES ProductUnit(id) ON DELETE SET NULL
+);
+
+CREATE INDEX diary_entry_date_idx ON DiaryEntry(entryDate);
+
+insertEntry:
+INSERT INTO DiaryEntry(id, productId, entryDate, amountGrams, unitUsedId, kcal, protein, fat, carb, createdAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteEntry:
+DELETE FROM DiaryEntry WHERE id = ?;
+
+selectEntriesForDate:
+SELECT * FROM DiaryEntry WHERE entryDate = ? ORDER BY createdAt ASC;
+
+-- Daily totals for a single day (used on "Today" screen)
+selectDailyTotals:
+SELECT
+    COALESCE(SUM(kcal), 0) AS totalKcal,
+    COALESCE(SUM(protein), 0) AS totalProtein,
+    COALESCE(SUM(fat), 0) AS totalFat,
+    COALESCE(SUM(carb), 0) AS totalCarb
+FROM DiaryEntry
+WHERE entryDate = ?;
+
+-- Per-day totals across an arbitrary date range (used for the 7-day mini chart
+-- and for the "step = day" mode on the Charts screen)
+selectDailyTotalsInRange:
+SELECT
+    entryDate,
+    COALESCE(SUM(kcal), 0) AS totalKcal,
+    COALESCE(SUM(protein), 0) AS totalProtein,
+    COALESCE(SUM(fat), 0) AS totalFat,
+    COALESCE(SUM(carb), 0) AS totalCarb
+FROM DiaryEntry
+WHERE entryDate BETWEEN :startDate AND :endDate
+GROUP BY entryDate
+ORDER BY entryDate ASC;
+
+-- How many diary entries reference a product (a product in use can't be deleted).
+countEntriesForProduct:
+SELECT COUNT(*) FROM DiaryEntry WHERE productId = ?;

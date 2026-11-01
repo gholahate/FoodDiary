@@ -1,0 +1,20 @@
+CREATE TABLE UserProfile (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    targetKcal REAL,      -- NULL = не отслеживается
+    targetProtein REAL,   -- NULL = не отслеживается
+    targetFat REAL,       -- NULL = не отслеживается
+    targetCarb REAL       -- NULL = не отслеживается
+);
+
+insertProfile:
+INSERT INTO UserProfile(id, name, targetKcal, targetProtein, targetFat, targetCarb)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateProfile:
+UPDATE UserProfile
+SET name = ?, targetKcal = ?, targetProtein = ?, targetFat = ?, targetCarb = ?
+WHERE id = ?;
+
+selectProfile:
+SELECT * FROM UserProfile LIMIT 1;

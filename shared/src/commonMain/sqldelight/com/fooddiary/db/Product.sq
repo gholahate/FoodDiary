@@ -1,0 +1,41 @@
+CREATE TABLE Product (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    calcMode TEXT NOT NULL,              -- 'MANUAL' | 'COMPUTED'
+    kcalPer100 REAL NOT NULL,
+    proteinPer100 REAL NOT NULL,
+    fatPer100 REAL NOT NULL,
+    carbPer100 REAL NOT NULL,
+    yieldGrams REAL,                     -- only meaningful for COMPUTED
+    source TEXT NOT NULL DEFAULT 'USER', -- 'USER' | 'AI' | 'SEED'
+    createdAt INTEGER NOT NULL,
+    updatedAt INTEGER NOT NULL
+);
+
+CREATE INDEX product_name_idx ON Product(name);
+
+insertProduct:
+INSERT INTO Product(id, name, calcMode, kcalPer100, proteinPer100, fatPer100, carbPer100, yieldGrams, source, createdAt, updatedAt)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateProduct:
+UPDATE Product
+SET name = ?, calcMode = ?, kcalPer100 = ?, proteinPer100 = ?, fatPer100 = ?, carbPer100 = ?, yieldGrams = ?, updatedAt = ?
+WHERE id = ?;
+
+updateComputedTotals:
+UPDATE Product
+SET kcalPer100 = ?, proteinPer100 = ?, fatPer100 = ?, carbPer100 = ?, updatedAt = ?
+WHERE id = ?;
+
+deleteProduct:
+DELETE FROM Product WHERE id = ?;
+
+selectProductById:
+SELECT * FROM Product WHERE id = ?;
+
+selectAllProducts:
+SELECT * FROM Product ORDER BY name COLLATE NOCASE ASC;
+
+searchProducts:
+SELECT * FROM Product WHERE name LIKE '%' || :query || '%' COLLATE NOCASE ORDER BY name COLLATE NOCASE ASC;

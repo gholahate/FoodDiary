@@ -1,0 +1,38 @@
+# Проверка сборки: при каждой отправке кода собирает debug-версию на серверах
+# GitHub. Если код не компилируется — во вкладке Actions будет красный крестик
+# и подробный лог ошибки. Собранный APK можно скачать (Artifacts, 7 дней).
+name: Проверка сборки
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Сборка debug
+        run: |
+          chmod +x gradlew
+          ./gradlew :androidApp:assembleDebug --stacktrace
+
+      - name: Сохранить APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: androidApp/build/outputs/apk/debug/*.apk
+          retention-days: 7

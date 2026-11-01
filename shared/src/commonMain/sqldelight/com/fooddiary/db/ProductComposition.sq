@@ -1,0 +1,35 @@
+CREATE TABLE ProductComposition (
+    id TEXT NOT NULL PRIMARY KEY,
+    parentProductId TEXT NOT NULL,
+    ingredientProductId TEXT NOT NULL,
+    amountGrams REAL NOT NULL,
+    FOREIGN KEY (parentProductId) REFERENCES Product(id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredientProductId) REFERENCES Product(id) ON DELETE RESTRICT
+);
+
+CREATE INDEX composition_parent_idx ON ProductComposition(parentProductId);
+CREATE INDEX composition_ingredient_idx ON ProductComposition(ingredientProductId);
+
+insertComposition:
+INSERT INTO ProductComposition(id, parentProductId, ingredientProductId, amountGrams)
+VALUES (?, ?, ?, ?);
+
+updateCompositionAmount:
+UPDATE ProductComposition SET amountGrams = ? WHERE id = ?;
+
+deleteComposition:
+DELETE FROM ProductComposition WHERE id = ?;
+
+deleteAllCompositionsForParent:
+DELETE FROM ProductComposition WHERE parentProductId = ?;
+
+selectCompositionByParent:
+SELECT * FROM ProductComposition WHERE parentProductId = ?;
+
+-- Used by the cycle-check: every edge in the graph (ingredient -> parent direction reversed for traversal)
+selectAllCompositionEdges:
+SELECT parentProductId, ingredientProductId FROM ProductComposition;
+
+-- Composed products that use this product as an ingredient.
+selectParentsUsingIngredient:
+SELECT DISTINCT parentProductId FROM ProductComposition WHERE ingredientProductId = ?;

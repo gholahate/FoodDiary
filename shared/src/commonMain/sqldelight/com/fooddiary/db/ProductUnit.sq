@@ -1,0 +1,32 @@
+CREATE TABLE ProductUnit (
+    id TEXT NOT NULL PRIMARY KEY,
+    productId TEXT NOT NULL,
+    unitName TEXT NOT NULL,
+    gramsPerUnit REAL NOT NULL,
+    FOREIGN KEY (productId) REFERENCES Product(id) ON DELETE CASCADE
+);
+
+CREATE INDEX product_unit_product_idx ON ProductUnit(productId);
+
+insertProductUnit:
+INSERT INTO ProductUnit(id, productId, unitName, gramsPerUnit)
+VALUES (?, ?, ?, ?);
+
+updateProductUnit:
+UPDATE ProductUnit SET unitName = ?, gramsPerUnit = ? WHERE id = ?;
+
+deleteProductUnit:
+DELETE FROM ProductUnit WHERE id = ?;
+
+selectUnitsByProduct:
+SELECT * FROM ProductUnit WHERE productId = ?;
+
+selectUnitById:
+SELECT * FROM ProductUnit WHERE id = ?;
+
+-- All measures of all products at once, for the product catalog list.
+selectAllUnits:
+SELECT * FROM ProductUnit ORDER BY unitName COLLATE NOCASE ASC;
+
+deleteUnitsForProduct:
+DELETE FROM ProductUnit WHERE productId = ?;

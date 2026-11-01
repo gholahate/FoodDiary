@@ -18,7 +18,7 @@ SQLDelight 2.0.2, Gradle 8.7 (в архиве полный wrapper: `gradlew`, `
 Gradle v8.7.0 — можно собирать из терминала: `./gradlew :androidApp:assembleDebug --stacktrace`),
 `jvmToolchain(21)`, compileSdk/targetSdk 34, minSdk 26, applicationId `com.fooddiary.android` (debug-сборки: `com.fooddiary.android.debug`, «Дневник (debug)» — отдельное
 приложение со своей базой; суффикс в `gradle.properties` → `debugAppIdSuffix`). **Версия — только в `gradle.properties`:**
-`appVersionName=0.6.0`, `appVersionCode=600` (схема: 0.6.1 → 601, 1.0.0 → 10000; при каждой выдаче архива с изменениями
+`appVersionName=0.6.1`, `appVersionCode=601` (схема: 0.6.1 → 601, 1.0.0 → 10000; при каждой выдаче архива с изменениями
 повышать). `BuildConfig.BUILD_TIME` — дата сборки. Release-подпись — из переменных окружения `FOODDIARY_*` или
 `keystore.properties` (не в git); без ключа release собирается неподписанным.
 Android-модуль устроен как KMP: исходники лежат в `androidApp/src/androidMain/`, не в `src/main/`.
@@ -89,17 +89,22 @@ Android-модуль устроен как KMP: исходники лежат в
   автокопия текущих данных в `files/backups/` (последние 3) → копия кладётся как `fooddiary.db.pending` → перезапуск →
   подмена файла в `FoodDiaryApp.onCreate` **до** открытия базы (`BackupManager.applyPendingRestore`). Код:
   `data/BackupManager.kt`, `ui/settings/BackupSection.kt`.
-- **GitHub (план согласован, итерация 1 из 2 сделана):** публичный репозиторий; `.github/workflows/build.yml` — проверка
+- **Репозиторий:** https://github.com/gholahate/FoodDiary (публичный; `githubRepo` в `gradle.properties` →
+  `BuildConfig.GITHUB_REPO`). Пользователь прошёл переход: рабочая версия 0.6.0 подписана release-ключом, данные
+  перенесены через резервную копию. Дальше обновления — только поверх.
+- **GitHub (итерации 1 и 2 сделаны):** публичный репозиторий; `.github/workflows/build.yml` — проверка
   сборки при push в `main` (debug APK в Artifacts); `release.yml` — по публикации Release с тегом `vX.Y.Z`: проверка тега
   против `appVersionName`, подпись из секретов `KEYSTORE_BASE64`/`KEYSTORE_PASSWORD`/`KEY_ALIAS`/`KEY_PASSWORD`, к
   релизу прикладываются `FoodDiary-X.Y.Z.apk`, `.sha256`, `version.json` (versionName, versionCode, apkUrl, sha256,
   notes). Пошаговые инструкции пользователю — `RELEASING.md` (ключ, репозиторий, секреты, первый релиз, разовый
   переход с debug-подписи через резервную копию или adb).
-  **Итерация 2 (не сделана):** проверка обновлений — при запуске не чаще раза в сутки (с отключением в Настройках) +
+  **Итерация 2 (0.6.1, `data/UpdateManager.kt`, `InstallResultReceiver.kt`, `ui/update/UpdateUi.kt`):** проверка обновлений — при запуске не чаще раза в сутки (с отключением в Настройках) +
   кнопка в «О приложении»; GitHub API `releases/latest` → asset `version.json` → сравнение versionCode → окно «Доступна
   версия» с notes → скачивание в память приложения с прогрессом → проверка SHA-256 → автокопия базы → установка через
-  `PackageInstaller` (разрешение `REQUEST_INSTALL_PACKAGES`, экран «Установка неизвестных приложений»). Нужно имя
-  пользователя GitHub для адреса репозитория.
+  `PackageInstaller` (разрешение `REQUEST_INSTALL_PACKAGES`, экран «Установка неизвестных приложений»). Проверка
+  читает `https://github.com/<repo>/releases/latest/download/version.json` (редирект GitHub, без API и ключей).
+  «Позже» = не всплывать сутки для этой versionCode. Debug-сборка: автопроверки нет, кнопка открывает страницу релиза.
+  0.6.1 ставится вручную (первая с механизмом); проверка «по воздуху» — выпуском 0.6.2.
 - **Тёмная тема:** «Настройки» → «Тема оформления»: Системная / Светлая / Тёмная (по умолчанию Системная), хранится в
   `AppSettings`. Цвета экрана — только из `MaterialTheme.colorScheme` или `StatusColors`; `Color.Black` и т.п. не
   использовать. Манифестная тема окна светлая (DayNight недоступна при minSdk 26), поэтому корень обёрнут в `Surface`.
@@ -138,7 +143,7 @@ Android-модуль устроен как KMP: исходники лежат в
 2. Экспорт/импорт базы в файл → инфраструктура миграций (первая миграция, схема v2) → **избранное в БД** (колонка у
    Product, решение пользователя; избранные первыми, пункт в долгом нажатии) + отложенные колонки: штрихкод у продукта,
    мера у ингредиента и у записи дневника.
-3. GitHub: см. раздел 5 «GitHub» — итерация 1 сделана (0.6.0), итерация 2 (обновление из приложения) — следующая.
+3. ~~GitHub~~ — сделано (0.6.0–0.6.1); осталось подтвердить обновление «по воздуху» выпуском 0.6.2.
 4. Health Connect: потраченные калории, шаги, сон (только чтение, без хранения в нашей БД).
 5. Планирование рациона на день/неделю — отдельная сессия вопросов (что такое план, шаблоны, «план → учтено», план/факт,
    список покупок), новые таблицы.

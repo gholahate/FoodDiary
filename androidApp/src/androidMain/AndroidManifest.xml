@@ -4,6 +4,9 @@
     <!-- Barcode lookup in Open Food Facts. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Installing app updates downloaded from GitHub Releases. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <application
         android:name=".FoodDiaryApp"
         android:label="${appLabel}"
@@ -18,6 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Result of an update installation (see UpdateManager). -->
+        <receiver
+            android:name=".InstallResultReceiver"
+            android:exported="false" />
 
         <!-- Ask Play services to fetch the barcode scanner module in advance. -->
         <meta-data

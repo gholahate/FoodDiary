@@ -38,6 +38,7 @@ import com.fooddiary.android.ui.scan.ScanScreen
 import com.fooddiary.android.ui.settings.SettingsScreen
 import com.fooddiary.android.ui.theme.AppTheme
 import com.fooddiary.android.ui.today.TodayScreen
+import com.fooddiary.android.ui.update.UpdateHost
 
 private enum class AppTab(val label: String, val icon: ImageVector) {
     TODAY("Сегодня", Icons.Filled.Home),
@@ -55,6 +56,8 @@ class MainActivity : ComponentActivity() {
             val themeMode by container.settings.themeMode.collectAsState()
             AppTheme(mode = themeMode) {
                 RootScaffold(container)
+                // Daily update check on start + the "Доступна версия" window over any screen.
+                UpdateHost(container.updates)
             }
         }
     }
@@ -202,7 +205,7 @@ private fun RootScaffold(container: AppContainer) {
             )
             AppTab.CHARTS -> ChartsScreen(container = container, modifier = Modifier.padding(padding))
             AppTab.PROFILE -> ProfileScreen(container = container, modifier = Modifier.padding(padding))
-            AppTab.SETTINGS -> SettingsScreen(settings = container.settings, backup = container.backup, modifier = Modifier.padding(padding))
+            AppTab.SETTINGS -> SettingsScreen(settings = container.settings, backup = container.backup, updates = container.updates, modifier = Modifier.padding(padding))
         }
     }
 }

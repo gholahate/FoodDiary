@@ -47,6 +47,8 @@ val appVersionCode = providers.gradleProperty("appVersionCode").get().toInt()
 // Debug builds get their own app id (".debug") so they live next to the real
 // app on the phone with their own data. Empty value = same id as the real app.
 val debugAppIdSuffix = providers.gradleProperty("debugAppIdSuffix").orNull.orEmpty()
+// GitHub repository ("owner/name") whose Releases the app checks for updates.
+val githubRepo = providers.gradleProperty("githubRepo").get()
 
 // ---- Release signing. Never committed to git. Values come from either
 //  - environment variables (GitHub Actions: from the repository secrets), or
@@ -79,6 +81,8 @@ android {
         // Shown in «Настройки → О приложении». Set at build time, local time of the build machine.
         val buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
+        // GitHub repository with releases, "owner/name" — where the app looks for updates.
+        buildConfigField("String", "GITHUB_REPO", "\"$githubRepo\"")
     }
 
     signingConfigs {

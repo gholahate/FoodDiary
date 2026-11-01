@@ -49,6 +49,31 @@ class AppSettings(context: Context) {
         _chartStyle.value = style
     }
 
+    // ---- Updates from GitHub ----
+
+    private val _autoCheckUpdates = MutableStateFlow(prefs.getBoolean(KEY_AUTO_UPDATES, true))
+    /** Check for a new version on app start (at most once a day). */
+    val autoCheckUpdates: StateFlow<Boolean> = _autoCheckUpdates
+
+    fun setAutoCheckUpdates(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUTO_UPDATES, enabled).apply()
+        _autoCheckUpdates.value = enabled
+    }
+
+    fun lastUpdateCheckMillis(): Long = prefs.getLong(KEY_LAST_UPDATE_CHECK, 0L)
+
+    fun setLastUpdateCheckMillis(value: Long) {
+        prefs.edit().putLong(KEY_LAST_UPDATE_CHECK, value).apply()
+    }
+
+    /** Version the user answered «Позже» to, and when (versionCode to millis). */
+    fun updateSnooze(): Pair<Int, Long> =
+        prefs.getInt(KEY_SNOOZE_CODE, -1) to prefs.getLong(KEY_SNOOZE_AT, 0L)
+
+    fun setUpdateSnooze(versionCode: Int, atMillis: Long) {
+        prefs.edit().putInt(KEY_SNOOZE_CODE, versionCode).putLong(KEY_SNOOZE_AT, atMillis).apply()
+    }
+
     /** For the backup file: all settings as simple name → value pairs. */
     fun exportValues(): Map<String, String> = mapOf(
         KEY_THEME to themeMode.value.name,
@@ -72,5 +97,9 @@ class AppSettings(context: Context) {
     private companion object {
         const val KEY_THEME = "theme_mode"
         const val KEY_CHART_STYLE = "chart_style"
+        const val KEY_AUTO_UPDATES = "auto_check_updates"
+        const val KEY_LAST_UPDATE_CHECK = "last_update_check"
+        const val KEY_SNOOZE_CODE = "update_snooze_code"
+        const val KEY_SNOOZE_AT = "update_snooze_at"
     }
 }

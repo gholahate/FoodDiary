@@ -3,6 +3,7 @@ package com.fooddiary.android
 import android.content.Context
 import com.fooddiary.android.data.AppSettings
 import com.fooddiary.android.data.BackupManager
+import com.fooddiary.android.data.UpdateManager
 import com.fooddiary.android.data.OpenFoodFactsClient
 import com.fooddiary.data.repository.SqlDelightDiaryRepository
 import com.fooddiary.data.repository.SqlDelightProductRepository
@@ -44,6 +45,9 @@ class AppContainer(context: Context) {
 
     /** Export / import of the whole diary to a file («Настройки → Резервная копия»). */
     val backup = BackupManager(context.applicationContext, driver, settings)
+
+    /** New versions from GitHub Releases («О приложении» + check on start). */
+    val updates = UpdateManager(context.applicationContext, settings, backup)
 
     private fun newId(): String = Uuid.random().toString()
     private fun nowEpochMillis(): Long = System.currentTimeMillis()

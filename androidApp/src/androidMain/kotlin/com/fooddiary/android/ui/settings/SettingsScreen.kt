@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import com.fooddiary.android.BuildConfig
 import com.fooddiary.android.data.AppSettings
 import com.fooddiary.android.data.BackupManager
+import com.fooddiary.android.data.UpdateManager
+import com.fooddiary.android.ui.update.UpdateSettingsSection
 import com.fooddiary.android.data.ChartStyle
 import com.fooddiary.android.data.ThemeMode
 import androidx.compose.ui.unit.dp
@@ -35,7 +37,12 @@ import androidx.compose.ui.unit.dp
  * implemented.
  */
 @Composable
-fun SettingsScreen(settings: AppSettings, backup: BackupManager, modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    settings: AppSettings,
+    backup: BackupManager,
+    updates: UpdateManager,
+    modifier: Modifier = Modifier,
+) {
     val themeMode by settings.themeMode.collectAsState()
 
     Column(modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp)) {
@@ -96,6 +103,7 @@ fun SettingsScreen(settings: AppSettings, backup: BackupManager, modifier: Modif
         InfoRow("Приложение", "Дневник питания")
         InfoRow("Версия", "${BuildConfig.VERSION_NAME} (сборка ${BuildConfig.VERSION_CODE})")
         InfoRow("Дата сборки", BuildConfig.BUILD_TIME)
+        UpdateSettingsSection(updates, settings)
     }
 }
 
